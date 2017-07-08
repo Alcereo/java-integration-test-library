@@ -36,7 +36,11 @@ public class DefaultShellAgent implements Agent{
         this.parser = parser;
     }
 
-//    ┌--------------------------------------------------┐
+    @Override
+    public void parserDestroySignal() {
+    }
+
+    //    ┌--------------------------------------------------┐
 //    |               process - DELEGATION               |
 //    └--------------------------------------------------┘
 

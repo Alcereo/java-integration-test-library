@@ -1,6 +1,7 @@
 package ru.alcereo.agents.springbootagent;
 
 import ru.alcereo.agents.DefaultShellAgent;
+import ru.alcereo.agents.exceptions.ProcessDiedException;
 import ru.alcereo.workers.ParserWorker;
 
 import java.util.Collections;
@@ -44,7 +45,7 @@ public class SpringBootTomcatAgent extends DefaultShellAgent {
      * @return
      * @throws InterruptedException
      */
-    public boolean waitForState(AgentState state, long timeout, TimeUnit unit) throws InterruptedException{
+    public boolean waitForState(AgentState state, long timeout, TimeUnit unit) throws InterruptedException, ProcessDiedException {
 
         long startTime = System.nanoTime();
         long rem = unit.toNanos(timeout);
@@ -57,16 +58,23 @@ public class SpringBootTomcatAgent extends DefaultShellAgent {
                 if (rem>0)
                     stateChangeMonitor.wait(unit.toMillis(timeout));
 
+                if (!isAlive())
+                    throw new ProcessDiedException();
+
                 rem = unit.toNanos(timeout) - (System.nanoTime() - startTime);
             } while (rem>0);
             return false;
         }
     }
 
-    public void waitForState(AgentState state) throws InterruptedException{
+    public void waitForState(AgentState state) throws InterruptedException, ProcessDiedException {
 
         synchronized (stateChangeMonitor) {
             while (!agentStates.contains(state)) {
+
+                if (!isAlive())
+                    throw new ProcessDiedException();
+
                 stateChangeMonitor.wait();
             }
         }
@@ -105,4 +113,11 @@ public class SpringBootTomcatAgent extends DefaultShellAgent {
         return this;
     }
 
+    @Override
+    public void parserDestroySignal() {
+        super.parserDestroySignal();
+        synchronized (stateChangeMonitor) {
+            stateChangeMonitor.notify();
+        }
+    }
 }

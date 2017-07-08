@@ -1,5 +1,6 @@
 package ru.alcereo;
 
+import ru.alcereo.agents.exceptions.ProcessDiedException;
 import ru.alcereo.agents.springbootagent.AgentState;
 import ru.alcereo.agents.springbootagent.SpringBootTomcatAgent;
 import ru.alcereo.runners.SpringBootTomcatJavaJarRunner;
@@ -26,13 +27,9 @@ public class ExecuteTest {
             agent.waitForState(AgentState.STARTED);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } catch (ProcessDiedException e) {
+            throw new RuntimeException("Application start error!", e);
         }
-
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
 
         System.out.println("Success!");
 

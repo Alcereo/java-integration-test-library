@@ -58,6 +58,8 @@ public class ShellParser {
             System.out.println("shutdown parser");
 
             executorService.shutdown();
+
+            agent.parserDestroySignal();
         });
 
         parseTread.setDaemon(true);

@@ -15,4 +15,5 @@ public interface Agent {
 
     int getExitCode();
 
+    void parserDestroySignal();
 }
